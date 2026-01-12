@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Pemesanan WhatsApp - Griya Tani</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background-color: #f0f4f0; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 600px; background: #fff; margin: auto; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 8px solid #2d6a4f; }
+        h1, h2 { color: #2d6a4f; text-align: center; margin-bottom: 5px; }
+        .description { background: #f1f8e9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2d6a4f; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #1b4332; }
+        input, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        .price-box { background: #fffbf2; padding: 15px; border: 1px dashed #e67e22; border-radius: 8px; margin-top: 20px; }
+        .total-row { font-size: 1.1em; color: #d35400; font-weight: bold; }
+        
+        /* Tombol WhatsApp */
+        .btn-wa { 
+            width: 100%; 
+            background: #25d366; 
+            color: white; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 17px; 
+            cursor: pointer; 
+            margin-top: 25px; 
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .btn-wa:hover { background: #128c7e; }
+        .footer-note { font-size: 12px; color: #777; margin-top: 20px; text-align: center; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>GRIYA TANI</h1>
+    <p style="text-align:center; margin-top:0;">SAYUR HEAD LETTUCE (SELADA KROP)</p>
+
+    <div class="description">
+        <strong>Manfaat & Keunggulan:</strong><br>
+        Bahan dasar salad, isian sandwich & burger. Tekstur renyah, segar, dan rasa lembut. Kaya Vitamin A, C, K, mineral, dan antioksidan. Membantu mencegah dehidrasi & meningkatkan imunitas.
+        
+    </div>
+
+    <form id="orderForm">
+        <h3>Formulir Pelanggan Baru</h3>
+        
+        <label for="nama">Nama Penerima</label>
+        <input type="text" id="nama" placeholder="Contoh: Budi Santoso" required>
+
+        <label for="wa">No. Tlp / WhatsApp</label>
+        <input type="tel" id="wa_pelanggan" placeholder="0812xxxx" required>
+
+        <label for="berat">Berat Pesanan (Min. 5kg)</label>
+        <input type="number" id="berat" min="5" value="5" oninput="hitungHarga()" required>
+
+        <label for="alamat">Alamat Lengkap (Khusus Jawa Timur)</label>
+        <textarea id="alamat" rows="3" placeholder="Nama Jalan, Kelurahan, Kecamatan, Kota/Kabupaten" required></textarea>
+
+        <div class="price-box">
+            <span>Harga Sayur: <span id="displayHargaSayur">Rp 80.000</span></span><br>
+            <span>Ongkos Kirim: <span id="displayOngkir">Rp 20.000</span></span>
+            <hr>
+            <div class="total-row">Total Pembayaran: <span id="displayTotal">Rp 120.000</span></div>
+        </div>
+
+        <button type="button" class="btn-wa" onclick="kirimKeWhatsApp()">
+            Kirim Order via WhatsApp
+        </button>
+    </form>
+
+    <div class="footer-note">
+        Pesanan akan dikirim menggunakan ekspedisi Clearesta dari Kota Malang. Alamat akan kami tinjau terlebih dahulu.
+    </div>
+</div>
+
+<script>
+    function hitungHarga() {
+        const berat = document.getElementById('berat').value;
+        const hargaPerKg = 16000;
+        const ongkirPer10kg = 20000;
+
+        let totalHargaSayur = berat * hargaPerKg;
+        let totalOngkir = Math.ceil(berat / 10) * ongkirPer10kg;
+
+        if (berat < 5) {
+            totalHargaSayur = 0;
+            totalOngkir = 0;
+        }
+
+        const totalBayar = totalHargaSayur + totalOngkir;
+
+        document.getElementById('displayHargaSayur').innerText = "Rp " + totalHargaSayur.toLocaleString('id-ID');
+        document.getElementById('displayOngkir').innerText = "Rp " + totalOngkir.toLocaleString('id-ID');
+        document.getElementById('displayTotal').innerText = "Rp " + totalBayar.toLocaleString('id-ID');
+        
+        return { totalHargaSayur, totalOngkir, totalBayar, berat };
+    }
+
+    function kirimKeWhatsApp() {
+        // Ganti nomor ini dengan nomor WA Griya Tani (awali dengan 62)
+        const noWhatsApp = "6285731725583"; 
+        
+        const nama = document.getElementById('nama').value;
+        const waPelanggan = document.getElementById('wa_pelanggan').value;
+        const alamat = document.getElementById('alamat').value;
+        const dataHarga = hitungHarga();
+
+        if(!nama || !waPelanggan || !alamat || dataHarga.berat < 5) {
+            alert("Harap lengkapi semua data dan minimal order 5kg!");
+            return;
+        }
+
+        const pesan = 
+            "*ORDER BARU - GRIYA TANI*%0A" +
+            "--------------------------------%0A" +
+            "*Nama Penerima:* " + nama + "%0A" +
+            "*No. HP:* " + waPelanggan + "%0A" +
+            "*Berat:* " + dataHarga.berat + " kg%0A" +
+            "*Alamat:* " + alamat + "%0A" +
+            "--------------------------------%0A" +
+            "*Rincian Biaya:*%0A" +
+            "- Harga Sayur: Rp " + dataHarga.totalHargaSayur.toLocaleString('id-ID') + "%0A" +
+            "- Ongkir: Rp " + dataHarga.totalOngkir.toLocaleString('id-ID') + "%0A" +
+            "*Total Bayar: Rp " + dataHarga.totalBayar.toLocaleString('id-ID') + "*%0A" +
+            "--------------------------------%0A" +
+            "Mohon segera ditinjau alamat pengirimannya. Terima kasih!";
+
+        const url = "https://api.whatsapp.com/send?phone=" + noWhatsApp + "&text=" + pesan;
+        
+        window.open(url, '_blank');
+    }
+</script>
+
+</body>
+</html>
